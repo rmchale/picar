@@ -1,0 +1,62 @@
+<html>
+<script src="bower_components/gyronorm/dist/gyronorm.complete.min.js"></script>
+<!--<script src="bower_components/jquery/dist/jquery.min.js"></script>-->
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<body>
+
+<script type="text/javascript">
+    var gn = new GyroNorm();
+    var socket = io();
+
+    gn.init().then(function(){
+        gn.start(function(data){
+            $('#alpha').text(data.do.alpha)
+            $('#beta').text(data.do.beta)
+            $('#gamma').text(data.do.gamma)
+            $('#absolute').text(data.do.absolute)
+
+
+            socket.emit ('send tilt', {alpha: data.do.alpha, beta: data.do.beta, gamma: data.do.gamma, abs: data.do.absolute});
+
+
+            // Process:
+            // data.do.alpha	( deviceorientation event alpha value )
+            // data.do.beta		( deviceorientation event beta value )
+            // data.do.gamma	( deviceorientation event gamma value )
+            // data.do.absolute	( deviceorientation event absolute value )
+
+            // data.dm.x		( devicemotion event acceleration x value )
+            // data.dm.y		( devicemotion event acceleration y value )
+            // data.dm.z		( devicemotion event acceleration z value )
+
+            // data.dm.gx		( devicemotion event accelerationIncludingGravity x value )
+            // data.dm.gy		( devicemotion event accelerationIncludingGravity y value )
+            // data.dm.gz		( devicemotion event accelerationIncludingGravity z value )
+
+            // data.dm.alpha	( devicemotion event rotationRate alpha value )
+            // data.dm.beta		( devicemotion event rotationRate beta value )
+            // data.dm.gamma	( devicemotion event rotationRate gamma value )
+        });
+    }).catch(function(e){
+        alert(e)
+        // Catch if the DeviceOrientation or DeviceMotion is not supported by the browser or device
+    });
+
+
+    $(document).ready(
+        function() {
+            console.log('foo2')
+            $('#welcome').text('hello world')
+        }
+    );
+
+</script>
+
+<div id="welcome"></div>
+<div>data.do.alpha <span id="alpha"></span></div>
+<div>data.do.beta <span id="beta"></span></div>
+<div>data.do.gamma <span id="gamma"></span></div>
+<div>data.do.absolute <span id="absolute"></span></div>
+</body>
+</html>

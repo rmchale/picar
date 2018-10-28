@@ -1,0 +1,96 @@
+<html>
+<head>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <meta name="apple-touch-fullscreen" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <script>
+
+        //------ Define your variables here
+        var socket = io();
+        var nIntervId;
+
+        highestgamma = 0
+        lowestgamma = 0
+        forward = 0
+        reverse = 0
+
+        // This function is called when the page 1st loads on your phone
+        //
+        $(function()
+        {
+            //send data to the pi at 20Hz
+            nIntervId = setInterval(SendToPi ,50);
+
+            window.gyro = 'ready';
+            alert('Ready -- Lets race !');
+
+        });
+
+
+        // This fuction is called @ 20Hz
+        //
+        function SendToPi()
+        {
+
+            $('#debug').text(window.gyro +' ' + Date.now() + ' ' + absgamma)
+            if (window.gyro == 'ready')
+            {
+                //dont send another command until last one doone... its only a little pi
+                window.gyro = 'notready';
+
+                socket.emit('fromdevice', { now:''+ Date.now(),
+                    gamma: gamma, beta: beta
+                });
+                // socket.emit('fromclient', { beta: beta, gamma: gamma } );
+                window.gyro = 'ready';
+            }//END if
+
+        }//End SendToPI
+
+        function getGamma(event) {
+            return  Math.round(event.gamma)
+        }
+
+        function fwd(gamma) {
+            console.log(gamma)
+             return gamma < 0 ? 0 : (gamma / 90)
+        }
+
+        function rev(gamma) {
+            return gamma > 0 ? 0 : gamma / -90
+        }
+
+        function getBeta(event) {
+            return Math.round(event.beta)
+        }
+
+
+
+        // This fuction is called when the phone orientation changes
+        //
+        window.ondeviceorientation = function(event)
+        {
+
+            beta = getBeta(event)
+            gamma=getGamma(event)
+
+
+        }//END ondviceorientation
+
+
+
+    </script>
+<body bgcolor="teal">
+<input type="button" value="stop" onclick="javascript:stop()"/>
+
+</head><body>
+
+<div id="debug"></div>
+<div id=info><font size=7><pre></pre>picar</pre></font></div>
+<div id=info><font size=3><pre></pre>https://github.com/lawsonkeith/picar</pre></font></div>
+
+</body>
+</head>
+</html>
